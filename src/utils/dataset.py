@@ -1,8 +1,8 @@
 import pandas as pd
 
-def get_splitting_dates(train='~/PycharmProjects/timeseries-nowcasting/data/train_dates.csv',
-                        valid='~/PycharmProjects/timeseries-nowcasting/data/valid_dates.csv',
-                        test='~/PycharmProjects/timeseries-nowcasting/data/test_dates.csv',
+def get_splitting_dates(train='~/storage/user/timeseries-nowcasting/data/train_dates.csv',
+                        valid='~/storage/user/timeseries-nowcasting/data/valid_dates.csv',
+                        test='~/storage/user/timeseries-nowcasting/data/test_dates.csv',
                         col_name='date'):
     train_dates = pd.read_csv(train)
     train_dates = pd.DatetimeIndex(train_dates[col_name].values)
