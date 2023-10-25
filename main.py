@@ -17,7 +17,6 @@ from pytorch_lightning import seed_everything
 from pytorch_lightning import loggers as pl_loggers
 import wandb
 
-from src.callbacks.log_model import LogModelWightsCallback
 from src.data.reader import ASIReader
 from src.data.dataset import ASIDatamodule
 from src.utils.model import circle_mask
@@ -236,9 +235,6 @@ def train(args):
         accelerator='auto',
         # devices=-1,
         # strategy='ddp'
-        callbacks=[
-            LogModelWightsCallback(log_every=10)
-        ]
     )
     trainer.fit(
         model=diffusion_model,
