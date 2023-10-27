@@ -42,7 +42,7 @@ class DiffusionModel(pl.LightningModule):
             for metric_name in self.metric_names
         }
 
-    def forward(self, previous_images, num_samples=8) -> list[np.ndarray]:
+    def forward(self, previous_images, num_samples=8):
         B = previous_images.shape[0]
         height, width = previous_images.shape[-2:]
         previous_images = previous_images.view(B, -1, height, width) # TODO: Concatenate all frames of a video in color channel?
