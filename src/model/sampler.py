@@ -55,16 +55,25 @@ class Sampler(DiffusionPipeline):
             `return_dict` is True, otherwise a `tuple. When returning a tuple, the first element is a list with the
             generated images.
         """
+        '''
+        
+        --- START: REMOVE BLOCK ---
+        
         message = (
             "Please make sure to instantiate your scheduler with `prediction_type` instead. E.g. `scheduler ="
             " DDPMScheduler.from_pretrained(<model_id>, prediction_type='epsilon')`."
         )
+        
         predict_epsilon = deprecate("predict_epsilon", "0.12.0", message, take_from=kwargs)
-
+        
         if predict_epsilon is not None:
             new_config = dict(self.scheduler.config)
             new_config["prediction_type"] = "epsilon" if predict_epsilon else "sample"
             self.scheduler._internal_dict = FrozenDict(new_config)
+        
+        --- END: REMOVE BLOCK ---
+        
+        '''
 
         if generator is not None and generator.device.type != self.device.type and self.device.type != "mps":
             message = (
