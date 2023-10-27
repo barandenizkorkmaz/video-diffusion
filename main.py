@@ -31,8 +31,7 @@ def parse_args():
     parser.add_argument(
         "--data_dir",
         type=str,
-        required=True,
-        #default="/home/dominik/Documents/AuSeSol/Data/HDF5/solar_nowcasting_data_asi.h5",
+        default="/usr/stud/korkmaz/storage/user/solar_nowcasting_data_asi.h5",
         help="Path to the HDF5 file containing the dataset.",
     )
     parser.add_argument(
