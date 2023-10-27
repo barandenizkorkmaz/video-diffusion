@@ -179,7 +179,7 @@ class DiffusionModel(pl.LightningModule):
 
             wandb.log({"validation": table, "global_step": self.global_step})
 
-    def validation_epoch_end(self, outputs):
+    def on_validation_epoch_end(self, outputs):
         metrics = np.array([self.val_metrics[metric_name] for metric_name in self.metric_names])
 
         # scatter plot
