@@ -21,6 +21,7 @@ from src.data.reader import ASIReader
 from src.data.dataset import ASIDatamodule
 from src.utils.model import circle_mask
 from src.model.model import DiffusionModel
+from src.callbacks.log_model import LogModelWightsCallback
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Training script of video diffusion.")
@@ -210,11 +211,11 @@ def train(args):
 
     # Create logger
     if args.logger_type == "wandb":
-        wandb.login()
+        wandb.login(key='29978854022cc12481ecfe3c333c045990262952')
         wandb.init(
             project="base-diffusion",
             #id=run_id,
-            entity="thesis",
+            entity="barandenizkorkmaz",
             config=args
         )
         logger = pl_loggers.WandbLogger(project="base-diffusion", log_model="all")
@@ -235,6 +236,9 @@ def train(args):
         accelerator='auto',
         # devices=-1,
         # strategy='ddp'
+        callbacks=[
+            LogModelWightsCallback(log_every=10)
+        ]
     )
     trainer.fit(
         model=diffusion_model,
