@@ -42,6 +42,8 @@ class DiffusionModel(pl.LightningModule):
             for metric_name in self.metric_names
         }
 
+        self.validation_step_outputs = []
+
     def forward(self, previous_images, num_samples=8):
         B = previous_images.shape[0]
         height, width = previous_images.shape[-2:]
@@ -179,7 +181,7 @@ class DiffusionModel(pl.LightningModule):
 
             wandb.log({"validation": table, "global_step": self.global_step})
 
-    def on_validation_epoch_end(self, outputs):
+    def on_validation_epoch_end(self):
         metrics = np.array([self.val_metrics[metric_name] for metric_name in self.metric_names])
 
         # scatter plot
