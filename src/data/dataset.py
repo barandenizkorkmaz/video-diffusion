@@ -1,3 +1,5 @@
+import os.path
+
 from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
 import pandas as pd
@@ -37,10 +39,16 @@ class ASIDatamodule(pl.LightningDataModule):
             num_workers=0,
             train_transform=None,
             eval_transform=None,
+            split_dir=None
     ):
         super().__init__()
         timestamps = asi_reader.get_valid_timestamps(asi_reader.all_timestamps)
-        train_dates, valid_dates, test_dates = get_splitting_dates()
+
+        train_dates, valid_dates, test_dates = get_splitting_dates(
+            train=os.path.join(split_dir, 'train_dates.csv'),
+            valid=os.path.join(split_dir, 'valid_dates.csv'),
+            test=os.path.join(split_dir, 'test_dates.csv')
+        )
 
         # set the train, validation and test timestamps as the timestamps that correspond to a date in the respective set
         self.train_ts = timestamps[pd.DatetimeIndex(timestamps.date).isin(train_dates)]
