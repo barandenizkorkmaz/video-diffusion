@@ -7,6 +7,7 @@ attrs
 certifi
 charset-normalizer
 click
+decorator
 diffusers
 docker-pycreds
 filelock
@@ -17,10 +18,13 @@ GitPython
 h5py
 huggingface-hub
 idna
+imageio
+imageio-ffmpeg
 importlib-metadata
 Jinja2
 lightning-utilities
 MarkupSafe
+moviepy
 mpmath
 multidict
 networkx
@@ -41,6 +45,7 @@ packaging
 pandas
 pathtools
 Pillow
+proglog
 protobuf
 psutil
 python-dateutil
