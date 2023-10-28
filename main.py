@@ -31,13 +31,19 @@ def parse_args():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="/usr/stud/korkmaz/storage/user/solar_nowcasting_data_asi.h5",
+        required=True,
         help="Path to the HDF5 file containing the dataset.",
+    )
+    parser.add_argument(
+        "--split_dir",
+        type=str,
+        required=True,
+        help="Path to the dates of data splits"
     )
     parser.add_argument(
         "--resolution",
         type=int,
-        default=64,
+        default=32,
         help=(
             "The resolution for input images, all the images in the train/validation dataset will be resized to this"
             " resolution"
@@ -141,7 +147,8 @@ def train(args):
         eval_batch_size=args.eval_batch_size,
         num_workers=args.num_workers,
         train_transform=train_transform,
-        eval_transform=eval_transform
+        eval_transform=eval_transform,
+        split_dir=args.split_dir
     )
 
     datamodule.prepare_data()
