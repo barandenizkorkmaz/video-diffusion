@@ -242,9 +242,9 @@ def train(args):
         accelerator='auto',
         # devices=-1,
         # strategy='ddp'
-        callbacks=[
-            LogModelWightsCallback(log_every=1)
-        ],
+        #callbacks=[
+        #    LogModelWightsCallback(log_every=1)
+        #],
         profiler="simple"
     )
     trainer.fit(
