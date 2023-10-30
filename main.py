@@ -244,7 +244,8 @@ def train(args):
         # strategy='ddp'
         callbacks=[
             LogModelWightsCallback(log_every=10)
-        ]
+        ],
+        profiler="advanced"
     )
     trainer.fit(
         model=diffusion_model,
