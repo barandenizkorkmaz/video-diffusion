@@ -52,8 +52,8 @@ class ASIDatamodule(pl.LightningDataModule):
 
         # set the train, validation and test timestamps as the timestamps that correspond to a date in the respective set
         self.train_ts = timestamps[pd.DatetimeIndex(timestamps.date).isin(train_dates)]
-        val_ts = timestamps[pd.DatetimeIndex(timestamps.date).isin(valid_dates)]
-        self.val_ts = np.random.RandomState(seed=0).permutation(val_ts)
+        self.val_ts = timestamps[pd.DatetimeIndex(timestamps.date).isin(valid_dates)]
+        #self.val_ts = np.random.RandomState(seed=0).permutation(val_ts)
         self.test_ts = timestamps[pd.DatetimeIndex(timestamps.date).isin(test_dates)]
 
         self.asi_reader = asi_reader
