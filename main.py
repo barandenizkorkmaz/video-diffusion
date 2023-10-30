@@ -235,15 +235,15 @@ def train(args):
         logger = None
 
     trainer = pl.Trainer(
-        check_val_every_n_epoch=5, # Switch back to 1 once done
+        check_val_every_n_epoch=1, # Switch back to 1 once done
         logger=logger,
-        log_every_n_steps=5, # Switch back to 1 once done
+        log_every_n_steps=1, # Switch back to 1 once done
         max_epochs=args.num_epochs,
         accelerator='auto',
         # devices=-1,
         # strategy='ddp'
         callbacks=[
-            LogModelWightsCallback(log_every=10)
+            LogModelWightsCallback(log_every=1)
         ],
         profiler="simple"
     )
