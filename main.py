@@ -235,9 +235,9 @@ def train(args):
         logger = None
 
     trainer = pl.Trainer(
-        check_val_every_n_epoch=5,
+        check_val_every_n_epoch=5, # Switch back to 1 once done
         logger=logger,
-        log_every_n_steps=5,
+        log_every_n_steps=5, # Switch back to 1 once done
         max_epochs=args.num_epochs,
         accelerator='auto',
         # devices=-1,
@@ -245,7 +245,7 @@ def train(args):
         callbacks=[
             LogModelWightsCallback(log_every=10)
         ],
-        profiler="advanced"
+        profiler="simple"
     )
     trainer.fit(
         model=diffusion_model,
