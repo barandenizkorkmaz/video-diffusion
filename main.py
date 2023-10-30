@@ -235,9 +235,9 @@ def train(args):
         logger = None
 
     trainer = pl.Trainer(
-        check_val_every_n_epoch=1,
+        check_val_every_n_epoch=5,
         logger=logger,
-        log_every_n_steps=1,
+        log_every_n_steps=5,
         max_epochs=args.num_epochs,
         accelerator='auto',
         # devices=-1,
