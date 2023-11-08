@@ -86,10 +86,14 @@ class DiffusionModel(pl.LightningModule):
         # Sample noise that we'll add to the images
         noise = torch.randn(clean_images.shape, device=clean_images.device)
         bsz = clean_images.shape[0]
+        print("Shape of Previous Images: ,", previous_images.shape)
+        print("Shape of Clean Images: ,", clean_images.shape)
+        print("Shape of Noise, ", noise.shape)
         # Sample a random timestep for each image
         timesteps = torch.randint(
             0, self.noise_scheduler.config.num_train_timesteps, (bsz,), device=clean_images.device
         ).long()
+        print("Timesteps: ", timesteps)
 
         # Add noise to the clean images according to the noise magnitude at each timestep
         # (this is the forward diffusion process)
