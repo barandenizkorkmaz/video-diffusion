@@ -198,8 +198,8 @@ class DiffusionModel(pl.LightningModule):
 
         end_time = time.time()
         print(f"(validation_step)\tElapsed Time of Line Execution 7: {(end_time - start_time):.3f}")
-        print("End: validation_step")
-        '''
+        start_time = end_time
+
         num_samples = 20 # TODO: Why?
         previous_samples = batch_idx * len(previous_images)
         if previous_samples <= num_samples:
@@ -212,7 +212,10 @@ class DiffusionModel(pl.LightningModule):
                 table.add_data(wandb.Video(previous, fps=1, format="gif"), gt, *video)
 
             wandb.log({"validation": table, "global_step": self.global_step})
-        '''
+
+        end_time = time.time()
+        print(f"(validation_step)\tElapsed Time of Line Execution 8: {(end_time - start_time):.3f}")
+        print("End: validation_step")
 
     def on_validation_epoch_end(self):
         import time
@@ -236,28 +239,32 @@ class DiffusionModel(pl.LightningModule):
         end_time = time.time()
         print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 4: {(end_time - start_time):.3f}")
         start_time = end_time
-        #scatter_table = wandb.Table(data=scatter_metrics.T, columns=["image id"] + self.metric_names)
+        scatter_table = wandb.Table(data=scatter_metrics.T, columns=["image id"] + self.metric_names)
         end_time = time.time()
         print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 5: {(end_time - start_time):.3f}")
         start_time = end_time
-        #for name in self.metric_names: # Plots the same table 3 times (i.e. namely val_{metric}_plot_table for metric in ["mse", "rmse", "mae"])
-        #    wandb.log({f"val_{name}_plot": wandb.plot.scatter(scatter_table, x="image id", y=name, title=name)})
+        for name in self.metric_names: # Plots the same table 3 times (i.e. namely val_{metric}_plot_table for metric in ["mse", "rmse", "mae"])
+            wandb.log({f"val_{name}_plot": wandb.plot.scatter(scatter_table, x="image id", y=name, title=name)})
+
+        end_time = time.time()
+        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 6: {(end_time - start_time):.3f}")
+        start_time = end_time
 
         # line plots and aggregations
         aggregations = [np.mean] #[np.mean, np.min, np.max]
         end_time = time.time()
-        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 6: {(end_time - start_time):.3f}")
+        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 7: {(end_time - start_time):.3f}")
         start_time = end_time
         for aggregation in aggregations:
             aggregated_metrics = aggregation(metrics, axis=2)
             for name, metric in zip(self.metric_names, aggregated_metrics):
                 self.log(f"val_{name}_{aggregation.__name__}", metric.mean(), on_step=False, on_epoch=True)
         end_time = time.time()
-        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 7: {(end_time - start_time):.3f}")
+        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 8: {(end_time - start_time):.3f}")
         start_time = end_time
 
         self.val_metrics = {metric_name: [] for metric_name in self.metric_names} # Reset val_metrics
         end_time = time.time()
-        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 8: {(end_time - start_time):.3f}")
+        print(f"(on_validation_epoch_end)\tElapsed Time of Line Execution 9: {(end_time - start_time):.3f}")
         start_time = end_time
         print("End: on_validation_epoch_end")
