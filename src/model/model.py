@@ -79,27 +79,28 @@ class DiffusionModel(pl.LightningModule):
                 denormalize(image, height, width)
                 for image in video])
             for video in videos])
+        print("Shape of Videos: ", videos.shape)
         return videos
 
     def training_step(self, batch, batch_idx):
-        previous_images, clean_images = batch
+        previous_images, current_images = batch
         # Sample noise that we'll add to the images
-        noise = torch.randn(clean_images.shape, device=clean_images.device)
-        bsz = clean_images.shape[0]
-        print("Shape of Previous Images: ,", previous_images.shape)
-        print("Shape of Clean Images: ,", clean_images.shape)
-        print("Shape of Noise, ", noise.shape)
+        noise = torch.randn(current_images.shape, device=current_images.device)
+        bsz = current_images.shape[0]
+        #print("Shape of Previous Images: ,", previous_images.shape)
+        #print("Shape of Clean Images: ,", current_images.shape)
+        #print("Shape of Noise, ", noise.shape)
         # Sample a random timestep for each image
         timesteps = torch.randint(
-            0, self.noise_scheduler.config.num_train_timesteps, (bsz,), device=clean_images.device
+            0, self.noise_scheduler.config.num_train_timesteps, (bsz,), device=current_images.device
         ).long()
-        print("Timesteps: ", timesteps)
+        #print("Timesteps: ", timesteps.shape)
 
         # Add noise to the clean images according to the noise magnitude at each timestep
         # (this is the forward diffusion process)
         # TODO: I understand here that clean_images denote the immediate current frames (to be predicted).
         # TODO: Why noise_scheduler take a noise input instead of automatically generating noise differently at each timestep? (i.e. sample noise timestep times)
-        noisy_images = self.noise_scheduler.add_noise(clean_images, noise, timesteps)
+        noisy_images = self.noise_scheduler.add_noise(current_images, noise, timesteps)
 
         # Note: Dim is 1
         all_images = torch.cat([previous_images, noisy_images], dim=1)
@@ -139,7 +140,7 @@ class DiffusionModel(pl.LightningModule):
         }
 
     def validation_step(self, batch, batch_idx):
-        previous_images, clean_images = batch
+        previous_images, current_images = batch
 
         height, width = previous_images.shape[-2:]
 
@@ -163,29 +164,31 @@ class DiffusionModel(pl.LightningModule):
             for video, image in zip(videos, images):
                 video.append(image.clamp(-1, 1))
 
-        clean_images = [denormalize(image, height, width) for image in clean_images]
+        current_images = [denormalize(image, height, width) for image in current_images]
         previous_images = [denormalize(image, height, width) for image in previous_images]
         videos = [np.stack([denormalize(image, height, width) for image in video]) for video in videos]
 
-        for clean_image, video in zip(clean_images, videos):
+        for clean_image, video in zip(current_images, videos):
             for metric_function, metric_name in zip(self.metric_functions, self.metric_names):
                 metrics = [metric_function(v, clean_image, self.mask).item() for v in video]
                 self.val_metrics[metric_name].append(metrics)
-
+        '''
         num_samples = 20 # TODO: Why?
         previous_samples = batch_idx * len(previous_images)
         if previous_samples <= num_samples:
             table = wandb.Table(
                 columns=["previous images", "ground truth"] + [f"seed {seed.item()}" for seed in self.seeds])
             remaining_samples = num_samples - previous_samples
-            for _, video, gt, previous in zip(range(remaining_samples), videos, clean_images, previous_images):
+            for _, video, gt, previous in zip(range(remaining_samples), videos, current_images, previous_images):
                 gt = concat_and_video(previous, gt)
                 video = [concat_and_video(previous, v) for v in video]
                 table.add_data(wandb.Video(previous, fps=1, format="gif"), gt, *video)
 
             wandb.log({"validation": table, "global_step": self.global_step})
+        '''
 
     def on_validation_epoch_end(self):
+        print("Start: on_validation_epoch_end")
         metrics = np.array([self.val_metrics[metric_name] for metric_name in self.metric_names])
 
         # scatter plot
@@ -193,14 +196,15 @@ class DiffusionModel(pl.LightningModule):
         scatter_metrics = np.concatenate([ids[None], metrics], axis=0)
         scatter_metrics = scatter_metrics.reshape(scatter_metrics.shape[0], -1)
         scatter_table = wandb.Table(data=scatter_metrics.T, columns=["image id"] + self.metric_names)
-        for name in self.metric_names:
-            wandb.log({f"val_{name}_plot": wandb.plot.scatter(scatter_table, x="image id", y=name, title=name)})
+        #for name in self.metric_names: # Plots the same table 3 times (i.e. namely val_{metric}_plot_table for metric in ["mse", "rmse", "mae"])
+        #    wandb.log({f"val_{name}_plot": wandb.plot.scatter(scatter_table, x="image id", y=name, title=name)})
 
         # line plots and aggregations
-        aggregations = [np.mean, np.min, np.max]
+        aggregations = [np.mean] #[np.mean, np.min, np.max]
         for aggregation in aggregations:
             aggregated_metrics = aggregation(metrics, axis=2)
             for name, metric in zip(self.metric_names, aggregated_metrics):
                 self.log(f"val_{name}_{aggregation.__name__}", metric.mean(), on_step=False, on_epoch=True)
 
-        self.val_metrics = {metric_name: [] for metric_name in self.metric_names}
+        self.val_metrics = {metric_name: [] for metric_name in self.metric_names} # Reset val_metrics
+        print("End: on_validation_epoch_end")
