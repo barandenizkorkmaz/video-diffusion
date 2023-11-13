@@ -240,7 +240,7 @@ def train(args):
         log_every_n_steps=1, # Switch back to 1 once done
         max_epochs=args.num_epochs,
         accelerator='auto',
-        # devices=-1,
+        devices=[1],
         # strategy='ddp'
         #callbacks=[
         #    LogModelWightsCallback(log_every=1)
