@@ -4,8 +4,8 @@ from inspect import signature
 import torch
 
 from diffusers.configuration_utils import FrozenDict
-#from diffusers.pipeline_utils import DiffusionPipeline, ImagePipelineOutput
-from diffusers.pipelines.pipeline_utils import DiffusionPipeline, ImagePipelineOutput
+from diffusers.pipeline_utils import DiffusionPipeline, ImagePipelineOutput
+#from diffusers.pipelines.pipeline_utils import DiffusionPipeline, ImagePipelineOutput
 from diffusers.utils import deprecate
 
 

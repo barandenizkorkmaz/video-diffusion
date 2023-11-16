@@ -1,4 +1,5 @@
 import typing as t
+from collections.abc import Iterable
 
 import pytorch_lightning as pl
 import wandb
@@ -51,7 +52,8 @@ class LogModelWightsCallback(Callback):
         if self.state["epochs"] % self.log_every == 0:
             # Check whether we have one logger or multiple
             # and log to all loggers we have
-            if isinstance(trainer.logger, Logger):
+            if isinstance(trainer.logger, Iterable):
+                print('Detected multiple loggers. Logging for each logger...')
                 for logger in trainer.logger:
                     self.save_model_weights(logger, trainer)
             else:

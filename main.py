@@ -1,3 +1,9 @@
+import os
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+
+import datetime
+timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
 import argparse
 import torch
 import pytorch_lightning as pl
@@ -52,7 +58,7 @@ def parse_args():
 
     parser.add_argument("--num_train_timesteps", type=int, default=1000)
     parser.add_argument("--beta_schedule", type=str, default="linear") # TODO: Different modes such as cosine and sigmoid should be added later.
-    parser.add_argument("--num_inference_steps", type=int, default=20, help="Number of inference steps.")
+    parser.add_argument("--num_inference_timesteps", type=int, default=20, help="Number of inference steps.")
 
     parser.add_argument(
         "--train_batch_size", type=int, default=128, help="Batch size (per device) for the train dataloaders."
@@ -107,7 +113,11 @@ def parse_args():
     # More Arguments Added by Baran Deniz Korkmaz
     parser.add_argument("--resume-from", nargs="?", type=str, default=None, help="The path to checkpoint to resume training")
     parser.add_argument("--logger_type", type=str, default="wandb", help="The type of logger")
-
+    parser.add_argument("--val_every_n_epoch", type=int, default=20, help="The number of epochs between every validation steps")
+    parser.add_argument("--run_id", type=str, default=None, help="W&B run id")
+    parser.add_argument("--log_every_n_steps", type=int, default=1, help="The number of epochs between every logging steps")
+    parser.add_argument("--save_checkpoint_every_n_steps", type=int, default=20, help="The number of epochs between every saving model checkpoint steps")
+    parser.add_argument("--save_checkpoint_path", type=str, required=True, help="The path to save model checkpoints")
     args = parser.parse_args()
     return args
 
@@ -212,15 +222,15 @@ def train(args):
 
     diffusion_model = DiffusionModel(
         model, noise_scheduler, args.num_inference_steps, optimizer, lr_scheduler,
-        ema_model=ema_model, num_samples=10, mask=mask
-    ) # TODO: num_samples is 3 by default
+        ema_model=ema_model, num_samples=1, mask=mask
+    )
 
     # Create logger
     if args.logger_type == "wandb":
         wandb.login(key='29978854022cc12481ecfe3c333c045990262952')
         wandb.init(
             project="base-diffusion",
-            #id=run_id,
+            id=args.run_id,
             entity="barandenizkorkmaz",
             config=args
         )
@@ -235,16 +245,19 @@ def train(args):
         logger = None
 
     trainer = pl.Trainer(
-        check_val_every_n_epoch=1, # Switch back to 1 once done
+        check_val_every_n_epoch=args.val_every_n_epoch,
         logger=logger,
-        log_every_n_steps=1, # Switch back to 1 once done
+        log_every_n_steps=args.log_every_n_steps,
         max_epochs=args.num_epochs,
         accelerator='auto',
-        # devices=-1,
+        devices=[0],
         # strategy='ddp'
-        #callbacks=[
-        #    LogModelWightsCallback(log_every=1)
-        #],
+        callbacks=[
+            LogModelWightsCallback(
+                log_every=args.save_checkpoint_every_n_steps,
+                checkpoint_path=os.path.join(args.save_checkpoint_path, timestamp)
+            )
+        ],
         profiler="simple"
     )
     trainer.fit(
