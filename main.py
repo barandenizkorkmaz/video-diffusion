@@ -1,3 +1,6 @@
+import os
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+
 import argparse
 import torch
 import pytorch_lightning as pl
