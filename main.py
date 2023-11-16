@@ -1,6 +1,9 @@
 import os
 os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
 
+import datetime
+timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
 import argparse
 import torch
 import pytorch_lightning as pl
@@ -114,6 +117,7 @@ def parse_args():
     parser.add_argument("--run_id", type=str, default=None, help="W&B run id")
     parser.add_argument("--log_every_n_steps", type=int, default=1, help="The number of epochs between every logging steps")
     parser.add_argument("--save_checkpoint_every_n_steps", type=int, default=20, help="The number of epochs between every saving model checkpoint steps")
+    parser.add_argument("--save_checkpoint_path", type=str, required=True, help="The path to save model checkpoints")
     args = parser.parse_args()
     return args
 
@@ -249,7 +253,10 @@ def train(args):
         devices=[0],
         # strategy='ddp'
         callbacks=[
-            LogModelWightsCallback(log_every=args.save_checkpoint_every_n_steps)
+            LogModelWightsCallback(
+                log_every=args.save_checkpoint_every_n_steps,
+                checkpoint_path=os.path.join(args.save_checkpoint_path, timestamp)
+            )
         ],
         profiler="simple"
     )
