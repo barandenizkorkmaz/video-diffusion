@@ -17,7 +17,7 @@ class DiffusionModel(pl.LightningModule):
             optimizer=None,
             lr_scheduler=None,
             ema_model=None,
-            num_samples=3,
+            num_samples=1,
             mask=None
     ):
         super().__init__()
