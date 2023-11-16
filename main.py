@@ -58,7 +58,7 @@ def parse_args():
 
     parser.add_argument("--num_train_timesteps", type=int, default=1000)
     parser.add_argument("--beta_schedule", type=str, default="linear") # TODO: Different modes such as cosine and sigmoid should be added later.
-    parser.add_argument("--num_inference_steps", type=int, default=20, help="Number of inference steps.")
+    parser.add_argument("--num_inference_timesteps", type=int, default=20, help="Number of inference steps.")
 
     parser.add_argument(
         "--train_batch_size", type=int, default=128, help="Batch size (per device) for the train dataloaders."
