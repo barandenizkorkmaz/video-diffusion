@@ -221,7 +221,7 @@ def train(args):
     mask = circle_mask(args.resolution, args.resolution, args.resolution // 2 + 3) # TODO: Understand here
 
     diffusion_model = DiffusionModel(
-        model, noise_scheduler, args.num_inference_steps, optimizer, lr_scheduler,
+        model, noise_scheduler, args.num_inference_timesteps, optimizer, lr_scheduler,
         ema_model=ema_model, num_samples=1, mask=mask
     )
 
